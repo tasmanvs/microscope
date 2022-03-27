@@ -11,10 +11,11 @@
 # Note - This can be run using something like pyuic5 main_window.ui > test.py
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from camera_module import CameraModule
 
 
 class Ui_main_window_(object):
-    def setupUi(self, main_window_):
+    def setupUi(self, main_window_, camera_module):
         main_window_.setObjectName("main_window_")
         main_window_.resize(177, 221)
         self.central_widget_ = QtWidgets.QWidget(main_window_)
@@ -27,7 +28,7 @@ class Ui_main_window_(object):
         self.vertical_layout_.setObjectName("vertical_layout_")
         self.start_preview_btn_ = QtWidgets.QPushButton(self.verticalLayoutWidget)
         self.start_preview_btn_.setObjectName("start_preview_btn_")
-        self.start_preview_btn_.clicked.connect(self.button_clicked)
+        self.start_preview_btn_.clicked.connect(camera_module.start_preview_clicked)
 
         self.vertical_layout_.addWidget(self.start_preview_btn_)
         self.end_preview_btn_ = QtWidgets.QPushButton(self.verticalLayoutWidget)
@@ -67,19 +68,17 @@ class Ui_main_window_(object):
     def button_clicked(self):
         print("Button clicked")
 
-
-
 def init():
-    print("init")
-
-
+    print ("Main window shown")
 
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     main_window_ = QtWidgets.QMainWindow()
     ui = Ui_main_window_()
-    ui.setupUi(main_window_)
+
+    camera_module = CameraModule()
+    ui.setupUi(main_window_, camera_module)
     main_window_.show()
 
     init()
