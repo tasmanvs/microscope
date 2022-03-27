@@ -33,9 +33,13 @@ class Ui_main_window_(object):
         self.vertical_layout_.addWidget(self.start_preview_btn_)
         self.end_preview_btn_ = QtWidgets.QPushButton(self.verticalLayoutWidget)
         self.end_preview_btn_.setObjectName("end_preview_btn_")
+        self.end_preview_btn_.clicked.connect(camera_module.end_preview_clicked)
+
         self.vertical_layout_.addWidget(self.end_preview_btn_)
         self.take_picture_btn_ = QtWidgets.QPushButton(self.verticalLayoutWidget)
         self.take_picture_btn_.setObjectName("take_picture_btn_")
+        self.take_picture_btn_.clicked.connect(camera_module.take_picture_clicked)
+
         self.vertical_layout_.addWidget(self.take_picture_btn_)
         self.file_name_input_ = QtWidgets.QLineEdit(self.verticalLayoutWidget)
         self.file_name_input_.setObjectName("file_name_input_")
