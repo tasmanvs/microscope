@@ -1,18 +1,21 @@
-class CameraModule(object):
-    condition = 'New'
+from PyQt5.QtCore import QObject, pyqtSignal
+
+class CameraModule(QObject):
     status_ = "initialized"
+    status_changed = pyqtSignal(str)
 
     def __init__(self):
-        pass
-        # self.brand = brand
-        # self.model = model
-        # self.color = color
-
+        super().__init__()
+        self.status_ = "initialized"
+        self.print_status()
+        
     def take_picture(self, file_name):
         self.condition = 'Used'
 
     def print_status(self):
         print(self.status_)
+        # Emit the signal
+        self.status_changed.emit(self.status_)
 
     def start_preview_clicked(self):
         self.status_ = "Start Preview Clicked"

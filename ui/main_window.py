@@ -32,6 +32,9 @@ class Ui_main_window_(object):
         # TODO - connect to slot?
         self.vertical_layout_.addWidget(self.status_)
 
+        # Connect the status label to the camera module
+        camera_module.status_changed.connect(self.status_.setText)
+
         self.start_preview_btn_ = QtWidgets.QPushButton(self.verticalLayoutWidget)
         self.start_preview_btn_.setObjectName("start_preview_btn_")
         self.start_preview_btn_.clicked.connect(camera_module.start_preview_clicked)

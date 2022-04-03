@@ -12,3 +12,4 @@ TODO:
 - Get video working
 - Get file streaming working
 - Create a Jira project?
+- Get status to update
