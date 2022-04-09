@@ -55,7 +55,7 @@ class Ui_main_window_(object):
 
         self.save_last_20_seconds_btn_ = QtWidgets.QPushButton(self.verticalLayoutWidget)
         self.save_last_20_seconds_btn_.setObjectName("save_last_20_seconds_btn_")
-        self.save_last_20_seconds_btn_.clicked.connect(camera_module.save_last_20_seconds_clicked)
+        self.save_last_20_seconds_btn_.clicked.connect(camera_module.record_circular_buffer_clicked)
         self.vertical_layout_.addWidget(self.save_last_20_seconds_btn_)
 
         self.file_name_input_ = QtWidgets.QLineEdit(self.verticalLayoutWidget)

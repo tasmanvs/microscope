@@ -12,9 +12,14 @@ rsync -r ui pi@192.168.86.23:~
 Copy images back to computer using
 
 TODO:
-- Wire up camera library
 - Remove Start/Stop preview buttons. Just start the preview automatically.
-- Get video working
 - Get file streaming working
 - Create a Jira project?
+- Add counter for how long we have been recording
+- Disable buttons depending on internal state
+- Gracefully handle exceptions
+
+DONE:
+- Wire up camera library
+- Get video working
 - Get status to update
