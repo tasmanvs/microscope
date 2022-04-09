@@ -43,6 +43,21 @@ class Ui_main_window_(object):
         self.take_picture_btn_.clicked.connect(camera_module.take_picture_clicked)
         self.vertical_layout_.addWidget(self.take_picture_btn_)
 
+        self.start_video_recording_btn_ = QtWidgets.QPushButton(self.verticalLayoutWidget)
+        self.start_video_recording_btn_.setObjectName("start_video_recording_btn_")
+        self.start_video_recording_btn_.clicked.connect(camera_module.start_video_recording_clicked)
+        self.vertical_layout_.addWidget(self.start_video_recording_btn_)
+
+        self.stop_video_recording_btn_ = QtWidgets.QPushButton(self.verticalLayoutWidget)
+        self.stop_video_recording_btn_.setObjectName("stop_video_recording_btn_")
+        self.stop_video_recording_btn_.clicked.connect(camera_module.stop_video_recording_clicked)
+        self.vertical_layout_.addWidget(self.stop_video_recording_btn_)
+
+        self.save_last_20_seconds_btn_ = QtWidgets.QPushButton(self.verticalLayoutWidget)
+        self.save_last_20_seconds_btn_.setObjectName("save_last_20_seconds_btn_")
+        self.save_last_20_seconds_btn_.clicked.connect(camera_module.save_last_20_seconds_clicked)
+        self.vertical_layout_.addWidget(self.save_last_20_seconds_btn_)
+
         self.file_name_input_ = QtWidgets.QLineEdit(self.verticalLayoutWidget)
         self.file_name_input_.setObjectName("file_name_input_")
         self.file_name_input_.textChanged.connect(camera_module.file_name_changed)
@@ -72,6 +87,9 @@ class Ui_main_window_(object):
         self.start_preview_btn_.setText(_translate("main_window_", "Start Preview"))
         self.end_preview_btn_.setText(_translate("main_window_", "End Preview"))
         self.take_picture_btn_.setText(_translate("main_window_", "Take Picture"))
+        self.start_video_recording_btn_.setText(_translate("main_window_", "Start Video Recording"))
+        self.stop_video_recording_btn_.setText(_translate("main_window_", "Stop Video Recording"))
+        self.save_last_20_seconds_btn_.setText(_translate("main_window_", "Save last 20 seconds"))
         self.menutest.setTitle(_translate("main_window_", "Options"))
 
 
