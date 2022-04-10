@@ -108,6 +108,9 @@ class Ui_main_window_(object):
         self.file_name_input_.textChanged.connect(camera_module.file_name_changed)
 
         # Hook up timelapse slots
+        self.start_timelapse_btn_.clicked.connect(camera_module.start_timelapse_clicked)
+        self.stop_timelapse_btn_.clicked.connect(camera_module.stop_timelapse_clicked)
+        self.timelapse_delay_spinbox_.valueChanged.connect(camera_module.timelapse_delay_changed)
 
         QtCore.QMetaObject.connectSlotsByName(main_window_)
         self.retranslateUi(main_window_)

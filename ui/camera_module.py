@@ -6,12 +6,39 @@ import subprocess
 import picamera
 import time
 
-
+# Import things for timelapse thread
+from threading import Thread
 
 # This class is used to control the camera module.
 # It is used to take pictures and to record videos.
 # It also has a signal that is emitted when we want to update the UI.
 
+
+# Thread for running timelapse
+class TimelapseThread(Thread):
+    def __init__(self, camera, delay_seconds, file_name):
+        super().__init__()
+        self.camera_ = camera
+        self.timelapse_delay_seconds_ = delay_seconds
+        self.file_name_ = file_name
+        self.stop_ = False
+        self.counter_ = 0
+
+    def run(self):
+        while not self.stop_:
+            target_directory = "images/" + self.file_name_
+            if not os.path.exists(target_directory):
+                os.makedirs(target_directory)
+
+            target_path = target_directory + "/" + str(self.counter_) + ".jpg"
+            print("Timelapse Thread: Taking picture at location " + target_path)
+            self.camera_.capture(target_path)
+            self.counter_ += 1
+            time.sleep(self.timelapse_delay_seconds_)
+
+        
+    def stop(self):
+        self.stop_ = True
 
 class CameraModule(QObject):
     # The latest status of the gui
@@ -32,6 +59,9 @@ class CameraModule(QObject):
     circular_stream_ = picamera.PiCameraCircularIO(camera_, seconds=circular_stream_length_seconds_)
 
     target_frame_rate_ = 25
+
+    timelapse_delay_seconds_ = 5
+    taking_timelapse_ = False
 
     file_name_ = "file_name"
 
@@ -126,3 +156,23 @@ class CameraModule(QObject):
 
     def get_status_text(self) -> str:
         return self.status_
+
+    # Functions for timelapse
+    def start_timelapse_clicked(self):
+        self.update_status("Start Timelapse Clicked")
+        self.taking_timelapse_ = True
+        self.timelapse_thread_ = TimelapseThread(self.camera_, self.timelapse_delay_seconds_, self.file_name_)
+        self.timelapse_thread_.start()
+        self.update_status("Started Timelapse thread with " + self.file_name_)
+
+    def stop_timelapse_clicked(self):
+        self.update_status("Stop Timelapse Clicked")
+        self.taking_timelapse_ = False
+        self.timelapse_thread_.stop()
+        self.update_status("Stopped Timelapse thread with " + self.file_name_)
+        
+    # handle timelapse spinbox delay changed
+    def timelapse_delay_changed(self, value):
+        self.update_status("Timelapse Delay Changed to " + str(value))
+        self.timelapse_delay_seconds_ = value
+
