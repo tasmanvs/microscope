@@ -4,15 +4,20 @@ import os
 import subprocess
 
 import picamera
+from picamera.array import PiRGBArray
 import time
 
 # Import things for timelapse thread
 from threading import Thread
 
+# For capturing to opencv
+import numpy as np
+import cv2
+
 # This class is used to control the camera module.
 # It is used to take pictures and to record videos.
 # It also has a signal that is emitted when we want to update the UI.
-
+# Note - Everything is saved as 1920x1080.
 
 # Thread for running timelapse
 class TimelapseThread(Thread):
@@ -30,9 +35,11 @@ class TimelapseThread(Thread):
             if not os.path.exists(target_directory):
                 os.makedirs(target_directory)
 
-            target_path = target_directory + "/" + str(self.counter_) + ".jpg"
-            print("Timelapse Thread: Taking picture at location " + target_path)
-            self.camera_.capture(target_path)
+            # We actually want to append 00001, 00002, 00003, etc.
+            file_name = target_directory + "/" + self.file_name_ + str(self.counter_).zfill(5) + ".jpg"
+
+            print("Timelapse Thread: Taking picture at location " + file_name)
+            self.camera_.capture(file_name)
             self.counter_ += 1
             time.sleep(self.timelapse_delay_seconds_)
 
@@ -50,6 +57,9 @@ class CameraModule(QObject):
     # Signal to update the label in the GUI
     status_changed_ = pyqtSignal(str)
 
+    # Signal to update the QGraphicsView in the GUI
+    cv_image_changed_ = pyqtSignal(np.ndarray)
+
     # Counter to keep track of the number of pictures taken
     counter_ = 0
 
@@ -64,6 +74,10 @@ class CameraModule(QObject):
     taking_timelapse_ = False
 
     file_name_ = "file_name"
+    resolution_ = (1920, 1088)
+
+    # Create empty cv image with the correct resolution
+    cv_image_ = np.empty((resolution_[1], resolution_[0], 3), dtype=np.uint8)
 
     def __init__(self):
         super().__init__()
@@ -75,8 +89,12 @@ class CameraModule(QObject):
         # Set the framerate to a fixed value of 25
         self.camera_.framerate = self.target_frame_rate_
 
+        # Set camera resolution to 1920x1080
+        self.camera_.resolution = self.resolution_
+
         # Start the circular stream recording. Note - port 2 is used for video recording
         self.camera_.start_recording(self.circular_stream_, format='h264')
+
 
     # Define the destructor
     def __del__(self):
@@ -104,6 +122,28 @@ class CameraModule(QObject):
     def end_preview_clicked(self):
         self.update_status("End Preview Clicked")
         self.camera_.stop_preview()
+
+    # Capture a picture to an opencv object
+    def opencv_capture_clicked(self):
+        self.update_status("Capturing picture to opencv")
+        # image = np.empty((self.camera_.resolution[1], self.camera_.resolution[0], 3), dtype=np.uint8)
+        # self.camera_.capture(image, format='bgr')
+        # image = image.reshape((self.camera_.resolution[0], self.camera_.resolution[1], 3))
+
+
+        rawCapture = PiRGBArray(self.camera_)
+        # grab an image from the camera
+        self.camera_.capture(rawCapture, format="bgr")
+        image = rawCapture.array
+        # display the image on screen and wait for a keypress
+        # cv2.imshow("Image", image)
+        # cv2.waitKey(0)
+
+        # # Save the cv image to the desktop
+        # cv2.imwrite("/home/pi/Desktop/cvimage.jpg", image)
+        
+        self.cv_image_ = image
+        self.cv_image_changed_.emit(self.cv_image_)
 
     def take_picture_clicked(self):
         self.update_status("Take Picture Clicked")
