@@ -142,48 +142,22 @@ class Ui_main_window_(object):
 
 
     def cv_image_to_qimage(self, cv_image):
-        """
-        Converts a cv2 image to a QImage
-        :param cv_image:
-        :return:
-        """
         height, width, channel = cv_image.shape
         bytes_per_line = channel * width
         q_image = QtGui.QImage(cv_image.data, width, height, bytes_per_line, QtGui.QImage.Format_RGB888)
 
-        # Save the qimage to the desktop
-        # q_image.save("/home/pi/Desktop/qimage.jpg")
-
-  
         return q_image
 
-
-        # height, width, channel = cv_image.shape
-        # bytes_per_line = 3 * width
-        # q_image = QtGui.QImage(cv_image.data, width, height, bytes_per_line, QtGui.QImage.Format_RGB888)
-        # return q_image
 
     # Convert the cv image to a QImage and display it in the Graphics View using a label
     def cv_image_changed(self, cv_image):
         q_image = self.cv_image_to_qimage(cv_image)
         self.image_label_.setPixmap(QtGui.QPixmap.fromImage(q_image))
 
-        # Make sure the image_label_ still fits in the window
-
-        # Scale the image label down to 20% of the qimage size
+        # Scale the image label down to 30% of the qimage size
         self.image_label_.resize(int(q_image.width() * 0.3), int(q_image.height() * 0.3))
-
-    
-
         self.image_label_.setScaledContents(True)
         self.image_label_.show()
-
-    # def cv_image_changed(self, cv_image):
-    #     q_image = self.cv_image_to_qimage(cv_image)
-    #     pixmap = QtGui.QPixmap.fromImage(q_image)
-    #     self.graphics_view_.setPixmap(pixmap)
-
-
 
 def init():
     print ("Main window shown")
