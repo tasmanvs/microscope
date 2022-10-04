@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QObject, pyqtSignal
+from PyQt5.QtCore import QObject, pyqtSignal, QTimer
 
 import os
 import subprocess
@@ -10,9 +10,30 @@ import time
 # Import things for timelapse thread
 from threading import Thread
 
+# For webstream
+from web_stream import CameraWebStream
+
 # For capturing to opencv
 import numpy as np
 import cv2
+
+
+class OpenCvOutput(object):
+    def __init__(self):
+        # Create an empty frame
+        self.frame = None
+
+    # Writes the buffer to an opencv image
+    def write(self, s):
+        data = np.fromstring(s, dtype=np.uint8)
+        self.frame = cv2.imdecode(data, 1)
+
+    def flush(self):
+        pass
+
+    def get_frame(self):
+        return self.frame
+
 
 # This class is used to control the camera module.
 # It is used to take pictures and to record videos.
@@ -47,6 +68,7 @@ class TimelapseThread(Thread):
     def stop(self):
         self.stop_ = True
 
+
 class CameraModule(QObject):
     # The latest status of the gui
     status_ = "initialized"
@@ -79,6 +101,16 @@ class CameraModule(QObject):
     # Create empty cv image with the correct resolution
     cv_image_ = np.empty((resolution_[1], resolution_[0], 3), dtype=np.uint8)
 
+    # Create webstream object
+    camera_web_stream_ = CameraWebStream(camera_)
+    
+
+    # Create an opencv stream
+    def create_opencv_stream(self):
+        self.opencv_stream_ = OpenCvOutput()
+        self.camera_.start_recording(self.opencv_stream_, format='mjpeg', splitter_port=3)
+
+
     def __init__(self):
         super().__init__()
         self.update_status("initialized")
@@ -95,12 +127,15 @@ class CameraModule(QObject):
         # Start the circular stream recording. Note - port 2 is used for video recording
         self.camera_.start_recording(self.circular_stream_, format='h264')
 
-
     # Define the destructor
     def __del__(self):
         print("Destructor called")
         print("Stopping the camera")
+        # Stop all the camera splitter ports
         self.camera_.stop_recording()
+        self.camera_.stop_recording(splitter_port=1)
+        self.camera_.stop_recording(splitter_port=2)
+        self.camera_.stop_recording(splitter_port=3)
         print("Closing the camera")
         self.camera_.close()
         
@@ -123,27 +158,29 @@ class CameraModule(QObject):
         self.update_status("End Preview Clicked")
         self.camera_.stop_preview()
 
+    def update_video_stream(self):
+        self.update_status("Capturing picture to opencv")
+        # Get the latest from from the OpenCV stream
+        self.cv_image_ = self.opencv_stream_.get_frame()
+        # Emit the signal to update the QGraphicsView in the GUI
+        self.cv_image_changed_.emit(self.cv_image_)
+
     # Capture a picture to an opencv object
     def opencv_capture_clicked(self):
-        self.update_status("Capturing picture to opencv")
-        # image = np.empty((self.camera_.resolution[1], self.camera_.resolution[0], 3), dtype=np.uint8)
-        # self.camera_.capture(image, format='bgr')
-        # image = image.reshape((self.camera_.resolution[0], self.camera_.resolution[1], 3))
+        self.camera_web_stream_.start()
+
+        # self.timer.start()
 
 
-        rawCapture = PiRGBArray(self.camera_)
-        # grab an image from the camera
-        self.camera_.capture(rawCapture, format="bgr")
-        image = rawCapture.array
-        # display the image on screen and wait for a keypress
-        # cv2.imshow("Image", image)
-        # cv2.waitKey(0)
-
-        # # Save the cv image to the desktop
-        # cv2.imwrite("/home/pi/Desktop/cvimage.jpg", image)
+        # rawCapture = PiRGBArray(self.camera_)
+        # # grab an image from the camera
+        # self.camera_.capture(rawCapture, format="bgr")
+        # image = rawCapture.array
         
-        self.cv_image_ = image
-        self.cv_image_changed_.emit(self.cv_image_)
+        # self.cv_image_ = image
+        # self.cv_image_changed_.emit(self.cv_image_)
+
+
 
     def take_picture_clicked(self):
         self.update_status("Take Picture Clicked")
