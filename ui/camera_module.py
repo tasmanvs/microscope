@@ -107,6 +107,12 @@ class CameraModule(QObject):
 
     # Create webstream object
     camera_web_stream_ = CameraWebStream(camera_)
+
+    # Create a queue of the last 4 image names
+    image_queue_ = []
+
+    # Signal to update the image queue
+    image_queue_changed_ = pyqtSignal(list)
     
 
     # Create an opencv stream
@@ -125,6 +131,10 @@ class CameraModule(QObject):
         # Create a directory for the folder as well
         if not os.path.exists("images/" + self.folder_prefix_):
             os.makedirs("images/" + self.folder_prefix_)
+
+        # Set the filename to the folder prefix plus a dummy name
+        self.file_name_ = self.folder_prefix_ + "/file_name"
+
 
         # Set the framerate to a fixed value of 25
         self.camera_.framerate = self.target_frame_rate_
@@ -197,6 +207,15 @@ class CameraModule(QObject):
         filepath = "images/" + self.file_name_ + str(self.counter_) + ".jpg"
         self.camera_.capture(filepath)
         self.update_status("Picture Taken at " + filepath)
+
+        # Add the image to the queue
+        self.image_queue_.append(filepath)
+        # If the queue is longer than 4, remove the first element
+        if len(self.image_queue_) > 4:
+            self.image_queue_.pop(0)
+        
+        # Update the image queue in the GUI
+        self.image_queue_changed_.emit(self.image_queue_)
 
     def start_video_recording_clicked(self):
         suffix = "_video"

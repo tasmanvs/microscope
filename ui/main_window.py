@@ -133,6 +133,9 @@ class Ui_main_window_(object):
         self.file_name_input_.textChanged.connect(camera_module.file_name_changed)
         self.opencv_capture_.clicked.connect(camera_module.opencv_capture_clicked)
 
+        # Update the image queue thumbnails
+        camera_module.image_queue_changed_.connect(self.update_image_queue_thumbnails)
+
         # Hook up timelapse slots
         self.start_timelapse_btn_.clicked.connect(camera_module.start_timelapse_clicked)
         self.stop_timelapse_btn_.clicked.connect(camera_module.stop_timelapse_clicked)
@@ -181,6 +184,23 @@ class Ui_main_window_(object):
         self.image_label_.resize(int(q_image.width() * 0.3), int(q_image.height() * 0.3))
         self.image_label_.setScaledContents(True)
         self.image_label_.show()
+
+    # Update the image queue thumbnail from the paths in the image queue. Note that the image queue size may be less than 4
+    def update_image_queue_thumbnails(self, image_queue):
+        thumbnail_list = [self.thumbnail_0, self.thumbnail_1, self.thumbnail_2, self.thumbnail_3]
+        for i in range(len(image_queue)):
+            q_image = QtGui.QImage(image_queue[i])
+            thumbnail_list[i].setPixmap(QtGui.QPixmap.fromImage(q_image))
+
+            # Scale the image label down to 30% of the qimage size
+            thumbnail_list[i].resize(int(q_image.width() * 0.3), int(q_image.height() * 0.3))
+            thumbnail_list[i].setScaledContents(True)
+            thumbnail_list[i].show()
+
+        # Clear the remaining thumbnails
+        for i in range(len(image_queue), len(thumbnail_list)):
+            thumbnail_list[i].clear()
+        
 
 def init():
     print ("Main window shown")

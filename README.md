@@ -10,6 +10,7 @@ Send this code to the pi running the microscope using
 rsync -r ui pi@192.168.86.29:~
 
 Copy images back to computer using
+rsync -r pi@192.168.86.29:~/images ~/Pictures/Microscope
 
 TODO:
 - Remove Start/Stop preview buttons. Just start the preview automatically.
