@@ -96,6 +96,10 @@ class CameraModule(QObject):
     taking_timelapse_ = False
 
     file_name_ = "file_name"
+    
+    # Create a folder prefix using the current date and time
+    folder_prefix_ = time.strftime("%Y-%m-%d_%H-%M-%S")
+
     resolution_ = (1920, 1088)
 
     # Create empty cv image with the correct resolution
@@ -117,6 +121,10 @@ class CameraModule(QObject):
         # Make an images directory if it doesn't exist
         if not os.path.exists("images"):
             os.makedirs("images")
+
+        # Create a directory for the folder as well
+        if not os.path.exists("images/" + self.folder_prefix_):
+            os.makedirs("images/" + self.folder_prefix_)
 
         # Set the framerate to a fixed value of 25
         self.camera_.framerate = self.target_frame_rate_
@@ -228,7 +236,8 @@ class CameraModule(QObject):
         subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     
     def file_name_changed(self, text):
-        self.file_name_ = text
+        # Add the folder prefix to the text to get the full file name
+        self.file_name_ = self.folder_prefix_ + "/" + text
         self.update_status("Set file name to " + self.file_name_)
 
     def get_status_text(self) -> str:

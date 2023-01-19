@@ -7,7 +7,7 @@ Use the dev raspberry pi to update the skeleton file using the update_skeleton.s
 ssh pi@192.168.86.61 'bash -s' <  scripts/update_skeleton.sh
 
 Send this code to the pi running the microscope using
-rsync -r ui pi@192.168.86.37:~
+rsync -r ui pi@192.168.86.29:~
 
 Copy images back to computer using
 
