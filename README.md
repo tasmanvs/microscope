@@ -3,11 +3,8 @@
 Run the main application using
 python3 ui/main_window.py
 
-Copy the file from the macos laptop to the dev raspberry pi
-scp ~/Desktop/main_window.ui pi@192.168.86.39:~/microscope/ui/
-
-Generate a python skeleton file from the qt .ui file using
-pyuic5 ui/main_window.ui > ui/skeleton.py
+Use the dev raspberry pi to update the skeleton file using the update_skeleton.sh script
+ssh pi@192.168.86.61 'bash -s' <  scripts/update_skeleton.sh
 
 Send this code to the pi running the microscope using
 rsync -r ui pi@192.168.86.37:~
